@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 1 - 장애물 게임</title>
+<style>
+  /* 전체 화면 설정 */
+  body, html {
+    margin: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #87CEEB;
+  }
+
+  /* 게임 컨테이너 */
+  #gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* 땅 (캐릭터가 움직이는 영역) */
+  #ground {
+    width: 100vw;
+    height: 35vh;
+    position: absolute;
+    bottom: 0;
+    background-color: #228B22;
+  }
+
+  /* 중앙에 위치한 캐릭터 */
+  #player {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url('images/player.png');
+    background-size: cover;
+  }
+
+
+  /* 장애물 스타일 */
+  .obstacle {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    background-image: url('images/obstacle.gif');
+    background-size: cover;
+  }
+
+  /* 상태 표시 - 점수판 고정 */
+  #status {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 24px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  /* 목숨 표시 */
+  #lives {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="gameContainer">
+  <div id="ground"></div>
+  <div id="player"></div>
+</div>
+<div id="status">점수: <span id="score">0</span> <br> 목숨: <span id="lives">❤️❤️❤️</span></div>
+
+<script>
+  const gameContainer = document.getElementById("gameContainer");
+  const ground = document.getElementById("ground");
+  const player = document.getElementById("player");
+  const scoreDisplay = document.getElementById("score");
+  const livesDisplay = document.getElementById("lives");
+
+  let score = 0;
+  let isJumping = false;
+  let jumpVelocity = 0;
+  const gravity = 0.35;
+  const jumpStrength = 10;
+  let playerY = window.innerHeight * 0.6;
+  let lives = 3;
+  let moveLeft = false;
+  let moveRight = false;
+
+  // 키보드 이벤트 리스너
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowUp" && !isJumping) jump();
+    if (event.key === "ArrowLeft") moveLeft = true;
+    if (event.key === "ArrowRight") moveRight = true;
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key === "ArrowLeft") moveLeft = false;
+    if (event.key === "ArrowRight") moveRight = false;
+  });
+
+  // 점프 함수
+  function jump() {
+    isJumping = true;
+    jumpVelocity = -jumpStrength;
+  }
+
+  // 장애물 생성 함수
+  function spawnObstacle() {
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = Math.max(window.innerWidth, window.innerHeight) / 2 + 50;
+    const startX = window.innerWidth / 2 + distance * Math.cos(angle);
+    const startY = window.innerHeight / 2 + distance * Math.sin(angle);
+
+    const obstacle = document.createElement("div");
+    obstacle.className = "obstacle";
+    obstacle.style.left = `${startX}px`;
+    obstacle.style.top = `${startY}px`;
+
+    const playerCenterX = player.offsetLeft + player.offsetWidth / 2;
+    const playerCenterY = player.offsetTop + player.offsetHeight / 2;
+    const dx = playerCenterX - startX;
+    const dy = playerCenterY - startY;
+    const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
+    const directionX = dx / distanceToPlayer;
+    const directionY = dy / distanceToPlayer;
+
+    const interval = setInterval(() => {
+      obstacle.style.left = `${obstacle.offsetLeft + directionX * 2}px`;
+      obstacle.style.top = `${obstacle.offsetTop + directionY * 2}px`;
+
+      if (checkCollision(player, obstacle)) {
+        obstacle.remove();
+        clearInterval(interval);
+        loseLife();
+      }
+
+      if (
+        obstacle.offsetLeft < -30 ||
+        obstacle.offsetTop < -30 ||
+        obstacle.offsetLeft > window.innerWidth + 30 ||
+        obstacle.offsetTop > window.innerHeight + 30
+      ) {
+        obstacle.remove();
+        clearInterval(interval);
+      }
+    }, 16);
+
+    gameContainer.appendChild(obstacle);
+  }
+
+  // 점수 업데이트 함수 
+function updateScore() {
+  score += 1;
+  scoreDisplay.textContent = score;
+
+  if (score >= 50) {
+    saveGameState(); // 상태를 저장하고 dialogue.html로 이동
+    window.location.href = "dialogue.html";
+  }
+}
+
+// 상태 저장 함수
+function saveGameState() {
+  localStorage.setItem("score", score);
+  localStorage.setItem("lives", lives);
+}
+
+  
+  // 충돌 체크 함수
+  function checkCollision(rect1, rect2) {
+    const rect1Bounds = rect1.getBoundingClientRect();
+    const rect2Bounds = rect2.getBoundingClientRect();
+    return !(
+      rect1Bounds.right < rect2Bounds.left ||
+      rect1Bounds.left > rect2Bounds.right ||
+      rect1Bounds.bottom < rect2Bounds.top ||
+      rect1Bounds.top > rect2Bounds.bottom
+    );
+  }
+
+  // 목숨 감소 함수
+  function loseLife() {
+    lives -= 1;
+    updateLivesDisplay();
+    if (lives === 0) endGame();
+  }
+
+  // 목숨 표시 업데이트 함수
+  function updateLivesDisplay() {
+    livesDisplay.textContent = "❤️".repeat(lives);
+  }
+
+  // 게임 업데이트 함수
+  function updateGame() {
+    if (moveLeft && player.offsetLeft > 0) {
+      player.style.left = `${player.offsetLeft - 5}px`;
+    }
+    if (moveRight && player.offsetLeft < window.innerWidth - player.offsetWidth) {
+      player.style.left = `${player.offsetLeft + 5}px`;
+    }
+
+    if (isJumping) {
+      jumpVelocity += gravity;
+      playerY += jumpVelocity;
+      if (playerY >= window.innerHeight * 0.6) {
+        playerY = window.innerHeight * 0.6;
+        isJumping = false;
+        jumpVelocity = 0;
+      }
+      player.style.top = `${playerY}px`;
+    }
+  }
+
+  // 게임 루프 함수
+  function gameLoop() {
+    updateGame();
+    requestAnimationFrame(gameLoop);
+  }
+
+  // 게임 종료 함수
+  function endGame() {
+    alert("게임 오버! 점수: " + score);
+    window.location.reload();
+  }
+
+  // 게임 시작 함수
+  function startGame() {
+    score = 0;
+    lives = 3;
+    updateScore();
+    updateLivesDisplay();
+    setInterval(spawnObstacle, 300);
+    setInterval(updateScore, 1000);
+    requestAnimationFrame(gameLoop);
+  }
+
+  startGame();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 2 - 보스전</title>
+<style>
+  body, html {
+    margin: 0;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #87CEEB;
+  }
+
+  #gameContainer {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    transform-origin: center;
+  }
+
+  #ground {
+    width: 100vw;
+    height: 35vh;
+    position: absolute;
+    bottom: 0;
+    background-color: #228B22;
+  }
+
+  #player {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-image: url('images/player.png');
+    background-size: cover;
+  }
+
+  #boss {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    background-image: url('images/boss.png');
+    background-size: cover;
+    border-radius: 50%;
+  }
+
+  @keyframes shake {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(-5px, -5px) rotate(-5deg); }
+    50% { transform: translate(0, 0) rotate(0deg); }
+    75% { transform: translate(5px, 5px) rotate(5deg); }
+    100% { transform: translate(0, 0) rotate(0deg); }
+  }
+
+  .hit {
+    animation: shake 0.1s ease;
+  }
+
+  .obstacle {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    background-image: url('images/obstacle.gif');
+    background-size: cover;
+  }
+
+  #status {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    color: white;
+    font-size: 24px;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  #lives {
+    margin-top: 10px;
+  }
+
+  #bossHPContainer {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 20px;
+    background-color: #555;
+  }
+
+  #bossHPBar {
+    height: 100%;
+    background-color: red;
+    width: 100%;
+    transition: width 0.2s;
+  }
+</style>
+</head>
+<body>
+
+<div id="gameContainer">
+  <div id="ground"></div>
+  <div id="player"></div> <!-- 플레이어 이미지 적용 -->
+  <div id="boss"></div>   <!-- 보스 이미지 적용 -->
+</div>
+<div id="status">목숨: <span id="lives">❤️❤️❤️</span></div>
+<div id="bossHPContainer">
+  <div id="bossHPBar"></div>
+</div>
+
+<script>
+  const gameContainer = document.getElementById("gameContainer");
+  const ground = document.getElementById("ground");
+  const player = document.getElementById("player");
+  const boss = document.getElementById("boss");
+  const livesDisplay = document.getElementById("lives");
+  const bossHPBar = document.getElementById("bossHPBar");
+
+  let lives = parseInt(localStorage.getItem("lives")) || 3;
+  let bossHP = 100;
+  let rotation = 0;
+  let isJumping = false;
+  let jumpVelocity = 0;
+  const gravity = 0.35;
+  const jumpStrength = 10;
+  let playerY = window.innerHeight * 0.6;
+  let moveLeft = false;
+  let moveRight = false;
+
+  // 보스 이동 속도와 방향
+  let bossSpeedX = getRandomSpeed(); // 초기 속도
+  let bossDirectionX = 1; // X축 이동 방향 (1: 오른쪽, -1: 왼쪽)
+
+// 랜덤 속도 생성 함수
+function getRandomSpeed() {
+  return Math.random() * (6 - 1) + 1; // 1 ~ 6 사이의 속도 반환
+}
+
+  function updateLivesDisplay() {
+    livesDisplay.textContent = "❤️".repeat(lives);
+  }
+
+  function updateBossHPDisplay() {
+    bossHPBar.style.width = `${(bossHP / 100) * 100}%`;
+  }
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowUp" && !isJumping) jump();
+    if (event.key === "ArrowLeft") moveLeft = true;
+    if (event.key === "ArrowRight") moveRight = true;
+    if (event.key === " " && checkCollision(player, boss)) {
+      bossHP -= 1;
+      updateBossHPDisplay();
+      if (bossHP <= 0) gameClear();
+      else bossHitEffect(); // 보스가 맞았을 때 효과 적용
+    }
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (event.key === "ArrowLeft") moveLeft = false;
+    if (event.key === "ArrowRight") moveRight = false;
+  });
+
+  function jump() {
+    isJumping = true;
+    jumpVelocity = -jumpStrength;
+  }
+
+  function rotateScreen() {
+    rotation += 0.1;
+    gameContainer.style.transform = `rotate(${rotation}deg)`;
+    requestAnimationFrame(rotateScreen);
+  }
+
+  function spawnObstacle() {
+    const angle = Math.random() * 2 * Math.PI;
+    const distance = Math.max(window.innerWidth, window.innerHeight) / 2 + 50;
+    const startX = window.innerWidth / 2 + distance * Math.cos(angle);
+    const startY = window.innerHeight / 2 + distance * Math.sin(angle);
+
+    const obstacle = document.createElement("div");
+    obstacle.className = "obstacle";
+    obstacle.style.left = `${startX}px`;
+    obstacle.style.top = `${startY}px`;
+
+    const playerCenterX = player.offsetLeft + player.offsetWidth / 2;
+    const playerCenterY = player.offsetTop + player.offsetHeight / 2;
+    const dx = playerCenterX - startX;
+    const dy = playerCenterY - startY;
+    const distanceToPlayer = Math.sqrt(dx * dx + dy * dy);
+
+    const speed = Math.random() * 3 + 1;
+    const directionX = dx / distanceToPlayer;
+    const directionY = dy / distanceToPlayer;
+
+    const interval = setInterval(() => {
+      obstacle.style.left = `${obstacle.offsetLeft + directionX * speed}px`;
+      obstacle.style.top = `${obstacle.offsetTop + directionY * speed}px`;
+
+      if (checkCollision(player, obstacle)) {
+        obstacle.remove();
+        clearInterval(interval);
+        loseLife();
+      }
+
+      if (
+        obstacle.offsetLeft < -30 ||
+        obstacle.offsetTop < -30 ||
+        obstacle.offsetLeft > window.innerWidth + 30 ||
+        obstacle.offsetTop > window.innerHeight + 30
+      ) {
+        obstacle.remove();
+        clearInterval(interval);
+      }
+    }, 16);
+
+    gameContainer.appendChild(obstacle);
+  }
+
+  function checkCollision(rect1, rect2) {
+    const rect1Bounds = rect1.getBoundingClientRect();
+    const rect2Bounds = rect2.getBoundingClientRect();
+    return !(
+      rect1Bounds.right < rect2Bounds.left ||
+      rect1Bounds.left > rect2Bounds.right ||
+      rect1Bounds.bottom < rect2Bounds.top ||
+      rect1Bounds.top > rect2Bounds.bottom
+    );
+  }
+
+  function loseLife() {
+    lives -= 1;
+    updateLivesDisplay();
+    if (lives === 0) endGame();
+  }
+
+  function updateGame() {
+    if (moveLeft && player.offsetLeft > 0) {
+      player.style.left = `${player.offsetLeft - 5}px`;
+    }
+    if (moveRight && player.offsetLeft < window.innerWidth - player.offsetWidth) {
+      player.style.left = `${player.offsetLeft + 5}px`;
+    }
+
+    if (isJumping) {
+      jumpVelocity += gravity;
+      playerY += jumpVelocity;
+      if (playerY >= window.innerHeight * 0.6) {
+        playerY = window.innerHeight * 0.6;
+        isJumping = false;
+        jumpVelocity = 0;
+      }
+      player.style.top = `${playerY}px`;
+    }
+  }
+
+
+  boss.style.left = `${window.innerWidth / 2 - boss.offsetWidth / 2}px`;
+  boss.style.top = `${window.innerHeight - ground.offsetHeight - boss.offsetHeight}px`; // 땅 위 고정
+
+  function moveBoss() {
+  // 현재 보스 위치 가져오기
+  const bossLeft = parseFloat(boss.style.left); // `px` 단위를 숫자로 변환
+
+  // 화면 경계에 도달했는지 확인
+  if (bossLeft <= 0) {
+    bossDirectionX = 1; // 오른쪽으로 이동
+    bossSpeedX = getRandomSpeed(); // 속도 랜덤 변경
+  } else if (bossLeft + boss.offsetWidth >= window.innerWidth) {
+    bossDirectionX = -1; // 왼쪽으로 이동
+    bossSpeedX = getRandomSpeed(); // 속도 랜덤 변경
+  }
+
+  // 보스 위치 업데이트
+  boss.style.left = `${bossLeft + bossSpeedX * bossDirectionX}px`;
+}
+
+setInterval(moveBoss, 16); // 약 60FPS로 업데이트
+
+  function bossHitEffect() {
+    boss.classList.add("hit");
+    setTimeout(() => {
+      boss.classList.remove("hit");
+    }, 300);
+  }
+
+  function gameLoop() {
+    updateGame();
+    moveBoss();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function endGame() {
+    alert("게임 오버! 목숨이 모두 소진되었습니다.");
+    window.location.reload();
+  }
+
+  function gameClear() {
+    alert("축하합니다! 보스를 물리쳤습니다!");
+    localStorage.clear();
+    window.location.href = "clear.html";
+  }
+
+  function startGame() {
+    updateLivesDisplay();
+    updateBossHPDisplay();
+    setInterval(spawnObstacle, 200); /*장애물 스폰*/
+    requestAnimationFrame(gameLoop);
+    rotateScreen();
+  }
+
+  startGame();
+</script>
+
+</body>
+</html>

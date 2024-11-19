@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>게임 클리어</title>
+<style>
+  /* 전체 화면 설정 */
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: white;
+    text-align: center;
+  }
+
+  /* 클리어 화면 스타일 */
+  #clearScreen {
+    max-width: 80%;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border-radius: 10px;
+    font-size: 24px;
+  }
+
+  #restartButton {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 18px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  #restartButton:hover {
+    background-color: #218838;
+  }
+</style>
+</head>
+<body>
+
+<div id="clearScreen">
+  <h1>축하합니다! 게임을 클리어했습니다!</h1>
+  <p>당신의 여정을 성공적으로 마무리했습니다. 다시 도전하고 싶다면 아래 버튼을 눌러 시작하세요.</p>
+  <button id="restartButton" onclick="restartGame()">다시 시작</button>
+</div>
+
+<script>
+  // 다시 시작 함수
+  function restartGame() {
+    window.location.href = "index.html"; // 시작 화면 또는 첫 번째 페이즈로 이동
+  }
+</script>
+
+</body>
+</html>
