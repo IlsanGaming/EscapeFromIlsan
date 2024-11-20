@@ -32,12 +32,12 @@
 
   #player {
     width: 50px;
-    height: 50px;
+    height: 100px;
     position: absolute;
-    top: 60%;
+    top: 57%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-image: url('images/player.png');
+    background-image: url('images/player.gif');
     background-size: cover;
   }
 
@@ -153,8 +153,14 @@ function getRandomSpeed() {
 
   window.addEventListener("keydown", (event) => {
     if (event.key === "ArrowUp" && !isJumping) jump();
-    if (event.key === "ArrowLeft") moveLeft = true;
-    if (event.key === "ArrowRight") moveRight = true;
+    if (event.key === "ArrowLeft") {
+        moveLeft = true;
+        player.style.backgroundImage = "url('images/player.gif')"; // 왼쪽 이동 이미지
+    }
+    if (event.key === "ArrowRight") {
+        moveRight = true;
+        player.style.backgroundImage = "url('images/player_right.gif')"; // 오른쪽 이동 이미지
+    }
     if (event.key === " " && checkCollision(player, boss)) {
       bossHP -= 1;
       updateBossHPDisplay();

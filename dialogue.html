@@ -26,6 +26,18 @@
     border-radius: 10px;
     text-align: center;
     font-size: 18px;
+    position: relative;
+  }
+
+  #dialogueImage {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   #nextButton {
@@ -58,21 +70,22 @@
 <body>
 
 <div id="dialogueBox">
+  <img id="dialogueImage" src="" alt="캐릭터 이미지">
   <p id="dialogueText"></p>
   <div id="transformation">김수빈이 변신 중...</div>
   <button id="nextButton" onclick="nextDialogue()">다음</button>
 </div>
 
 <script>
-  // 대사 목록 (변신 장면 포함)
+  // 대사 목록 (이미지와 변신 장면 포함)
   const dialogues = [
-    { speaker: "김수빈", text: "여기까지 오다니 대단하군... 하지만 이제부터가 진짜다!" },
-    { speaker: "김규석", text: "김수빈, 그게 무슨말이야" },
-    { speaker: "김수빈", text: "나는 이 디지털 세계의 관리자다. 이 세계를 탈출하고 싶으면 날 쓰러뜨려야 할거야!!" },
-    { type: "transformation", text: "김수빈이 변신 중..." }, // 변신 장면 삽입
-    { speaker: "김규석", text: "이럴수가... 김수빈, 여직까지의 모습은 모두 거짓이었나?" },
-    { speaker: "김수빈", text: "여기서 살아서 나간 사람은 없다! 나의 진정한 힘을 보여주마. 준비되었나?" },
-    { speaker: "김규석", text: "좋아, 나도 최선을 다하지." },
+    { speaker: "김수빈", text: "여기까지 오다니 대단하군... 하지만 이제부터가 진짜다!", image: "images/kimsubin.png" },
+    { speaker: "김규석", text: "김수빈, 그게 무슨 말이야?", image: "images/kks.png" },
+    { speaker: "김수빈", text: "나는 이 디지털 세계의 관리자다. 이 세계를 탈출하고 싶으면 날 쓰러뜨려야 할 거야!", image: "images/kimsubin.png" },
+    { type: "transformation", text: "김수빈이 변신 중...", image: "images/transform.gif" }, // 변신 장면
+    { speaker: "김규석", text: "이럴 수가... 김수빈, 여태까지의 모습은 모두 거짓이었나?", image: "images/kks.png" },
+    { speaker: "김수빈", text: "여기서 살아서 나간 사람은 없다! 나의 진정한 힘을 보여주마. 준비되었나?", image: "images/ksb.png" },
+    { speaker: "김규석", text: "좋아, 나도 최선을 다하지.", image: "images/kks.png" },
   ];
 
   let dialogueIndex = 0;
@@ -80,22 +93,26 @@
   // 대사 표시 함수
   function displayDialogue() {
     const currentDialogue = dialogues[dialogueIndex];
-    
+    const dialogueImage = document.getElementById("dialogueImage");
+    const dialogueText = document.getElementById("dialogueText");
+
     if (currentDialogue.type === "transformation") {
       // 변신 장면 표시
-      document.getElementById("dialogueText").style.display = "none";
+      dialogueImage.src = currentDialogue.image; // 변신 이미지 표시
+      dialogueText.style.display = "none";
       document.getElementById("transformation").style.display = "block";
       
       // 변신 장면을 3초 동안 보여주고 다음 대사로 전환
       setTimeout(() => {
         document.getElementById("transformation").style.display = "none";
-        document.getElementById("dialogueText").style.display = "block";
+        dialogueText.style.display = "block";
         dialogueIndex++;
         displayDialogue();
       }, 3000);
     } else {
       // 일반 대사 표시
-      document.getElementById("dialogueText").innerHTML = `<strong>${currentDialogue.speaker}:</strong> ${currentDialogue.text}`;
+      dialogueImage.src = currentDialogue.image; // 이미지 업데이트
+      dialogueText.innerHTML = `<strong>${currentDialogue.speaker}:</strong> ${currentDialogue.text}`;
     }
   }
 
