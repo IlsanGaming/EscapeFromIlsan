@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Phase 1 - 장애물 게임</title>
+<link rel="stylesheet" href="style.css">
+
 <style>
   /* 전체 화면 설정 */
   body, html {
@@ -12,7 +15,8 @@
     width: 100vw;
     height: 100vh;
     font-family: Arial, sans-serif;
-    background-color: #87CEEB;
+    background-color: url('images/background.png');
+    z-index: -1; /* 게임 컨테이너 뒤로 이동 */
   }
 
   /* 게임 컨테이너 */
@@ -74,6 +78,9 @@
 </style>
 </head>
 <body>
+
+<div id="backgroundWrapper">
+</div>
 
 <div id="gameContainer">
   <div id="ground"></div>

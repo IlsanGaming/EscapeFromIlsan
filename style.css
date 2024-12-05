@@ -30,3 +30,22 @@ body, html {
     background-color: #218838;
   }
   
+  #backgroundWrapper {
+    width: 200vw; /* 화면보다 2배 넓게 */
+    height: 200vh; /* 화면보다 2배 높게 */
+    position: fixed;
+    top: -50vh; /* 중앙에 맞추기 */
+    left: -50vw; /* 중앙에 맞추기 */
+    background-image: url('./images/background.png'); /* 배경 이미지 경로 */
+    background-size: 150%; /* 이미지가 컨테이너를 채우도록 설정 */
+    background-position: center;
+    z-index: -1; /* 게임 컨테이너 뒤로 이동 */
+  }
+  
+  #gameContainer {
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: 1; /* 게임 화면 위에 표시 */
+  }

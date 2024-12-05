@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Phase 2 - 보스전</title>
+
 <style>
   body, html {
     margin: 0;
@@ -105,15 +107,21 @@
 </head>
 <body>
 
-<div id="gameContainer">
-  <div id="ground"></div>
-  <div id="player"></div> <!-- 플레이어 이미지 적용 -->
-  <div id="boss"></div>   <!-- 보스 이미지 적용 -->
-</div>
-<div id="status">목숨: <span id="lives">❤️❤️❤️</span></div>
-<div id="bossHPContainer">
-  <div id="bossHPBar"></div>
-</div>
+  <div id="backgroundWrapper">
+    <div id="gameContainer">
+      <div id="ground"></div>
+      <div id="player"></div> <!-- 플레이어 이미지 적용 -->
+      <div id="boss"></div>   <!-- 보스 이미지 적용 -->
+    </div>
+  </div>
+
+  <!-- 고정된 UI 요소 -->
+  <div id="fixedUI">
+    <div id="status">목숨: <span id="lives">❤️❤️❤️</span></div>
+    <div id="bossHPContainer">
+      <div id="bossHPBar"></div>
+    </div>
+  </div>
 
 <script>
   const gameContainer = document.getElementById("gameContainer");
@@ -138,6 +146,19 @@
   let bossSpeedX = getRandomSpeed(); // 초기 속도
   let bossDirectionX = 1; // X축 이동 방향 (1: 오른쪽, -1: 왼쪽)
 
+// 배경 회전
+  function rotateBackground() {
+    rotation += 0.1; // 회전 속도
+    const rotationStyle = `rotate(${rotation}deg)`;
+
+  // 배경과 게임 컨테이너를 함께 회전
+    document.getElementById("backgroundWrapper").style.transform = rotationStyle;
+    document.getElementById("gameContainer").style.transform = rotationStyle;
+
+    requestAnimationFrame(rotateBackground);
+  }
+
+  rotateBackground(); // 애니메이션 시작
 // 랜덤 속도 생성 함수
 function getRandomSpeed() {
   return Math.random() * (6 - 1) + 1; // 1 ~ 6 사이의 속도 반환
