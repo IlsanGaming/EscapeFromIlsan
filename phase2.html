@@ -13,7 +13,7 @@
     width: 100vw;
     height: 100vh;
     font-family: Arial, sans-serif;
-    background-color: #87CEEB;
+    background-color: #ffffff;
   }
 
   #gameContainer {
@@ -29,7 +29,7 @@
     height: 35vh;
     position: absolute;
     bottom: 0;
-    background-color: #228B22;
+    background-color: #000000;
   }
 
   #player {
@@ -39,7 +39,7 @@
     top: 57%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-image: url('images/player.gif');
+    background-image: url('./images/player.gif');
     background-size: cover;
   }
 
@@ -70,6 +70,7 @@
     position: absolute;
     background-image: url('images/obstacle.gif');
     background-size: cover;
+    z-index: 3;
   }
 
   #status {
@@ -176,11 +177,11 @@ function getRandomSpeed() {
     if (event.key === "ArrowUp" && !isJumping) jump();
     if (event.key === "ArrowLeft") {
         moveLeft = true;
-        player.style.backgroundImage = "url('images/player.gif')"; // 왼쪽 이동 이미지
+        player.style.backgroundImage = "url('./images/player.gif')"; // 왼쪽 이동 이미지
     }
     if (event.key === "ArrowRight") {
         moveRight = true;
-        player.style.backgroundImage = "url('images/player_right.gif')"; // 오른쪽 이동 이미지
+        player.style.backgroundImage = "url('./images/player_right.gif')"; // 오른쪽 이동 이미지
     }
     if (event.key === " " && checkCollision(player, boss)) {
       bossHP -= 1;
@@ -316,7 +317,15 @@ setInterval(moveBoss, 16); // 약 60FPS로 업데이트
     setTimeout(() => {
       boss.classList.remove("hit");
     }, 300);
-  }
+
+    // 효과음 재생
+  const hitSound = new Audio("./soung/damage.mp3");
+  hitSound.volume = 0.7; // 볼륨 설정
+  hitSound.play().catch((error) => {
+    console.error("효과음 재생 실패:", error);
+  });
+}
+  
 
   function gameLoop() {
     updateGame();

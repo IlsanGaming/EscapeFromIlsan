@@ -1,0 +1,18 @@
+<!-- audio.html -->
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>배경음악</title>
+</head>
+<body>
+<audio id="backgroundMusic" autoplay loop>
+  <source src="./sound/bgm.mp3" type="audio/mp3">
+  브라우저가 오디오를 지원하지 않습니다.
+</audio>
+<script>
+  const backgroundMusic = document.getElementById("backgroundMusic");
+  backgroundMusic.volume = 1; // 볼륨 설정
+</script>
+</body>
+</html>

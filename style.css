@@ -1,51 +1,88 @@
 body, html {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Arial, sans-serif;
-    background-color: #222;
-    color: white;
-  }
-  
-  .screen {
-    text-align: center;
-  }
-  
-  button {
-    padding: 15px 30px;
-    font-size: 18px;
-    border: none;
-    border-radius: 5px;
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  button:hover {
-    background-color: #218838;
-  }
-  
-  #backgroundWrapper {
-    width: 200vw; /* 화면보다 2배 넓게 */
-    height: 200vh; /* 화면보다 2배 높게 */
-    position: fixed;
-    top: -50vh; /* 중앙에 맞추기 */
-    left: -50vw; /* 중앙에 맞추기 */
-    background-image: url('./images/background.png'); /* 배경 이미지 경로 */
-    background-size: 150%; /* 이미지가 컨테이너를 채우도록 설정 */
-    background-position: center;
-    z-index: -1; /* 게임 컨테이너 뒤로 이동 */
-  }
-  
-  #gameContainer {
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    z-index: 1; /* 게임 화면 위에 표시 */
-  }
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.screen {
+  text-align: center;
+}
+
+button {
+  padding: 15px 30px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+#backgroundWrapper {
+  position: fixed;
+  width: 200vw;
+  height: 200vh;
+  top: -50vh;
+  left: -50vw;
+  background-image: url('images/background2.png');
+  background-size: cover;
+  background-position: center;
+  z-index: -5;
+  transform-origin: center;
+}
+
+#ground {
+  position: absolute;
+  bottom: 0;
+  width: 100vw;
+  height: 35vh;
+  background-color: black;
+}
+
+
+
+#boss {
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  bottom: 35vh;
+  left: 20%;
+  background-image: url('images/boss.png');
+  background-size: cover;
+  border-radius: 50%;
+}
+
+#status {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  color: white;
+  font-size: 24px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+#bossHPContainer {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 20px;
+  background-color: #555;
+}
+
+#bossHPBar {
+  width: 100%;
+  height: 100%;
+  background-color: red;
+  transition: width 0.2s;
+}

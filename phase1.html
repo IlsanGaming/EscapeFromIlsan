@@ -8,23 +8,13 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-  /* 전체 화면 설정 */
-  body, html {
-    margin: 0;
-    overflow: hidden;
-    width: 100vw;
-    height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: url('images/background.png');
-    z-index: -1; /* 게임 컨테이너 뒤로 이동 */
-  }
-
-  /* 게임 컨테이너 */
-  #gameContainer {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
+  .obstacle {
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    background-image: url('images/obstacle.gif');
+    background-size: cover;
+    z-index: 3;
   }
 
   /* 땅 (캐릭터가 움직이는 영역) */
@@ -33,52 +23,28 @@
     height: 35vh;
     position: absolute;
     bottom: 0;
-    background-color: #228B22;
+    background-color: #000000;
   }
 
   /* 중앙에 위치한 캐릭터 */
   #player {
-    width: 50px;
+    width: 100px;
     height: 100px;
     position: absolute;
     top: 57%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-image: url('images/player.gif');
+    background-image: url('./images/player_right1.gif');
     background-size: cover;
   }
 
 
-  /* 장애물 스타일 */
-  .obstacle {
-    width: 30px;
-    height: 30px;
-    position: absolute;
-    background-image: url('images/obstacle.gif');
-    background-size: cover;
-  }
 
-  /* 상태 표시 - 점수판 고정 */
-  #status {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    color: white;
-    font-size: 24px;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    border-radius: 8px;
-    z-index: 10;
-  }
-
-  /* 목숨 표시 */
-  #lives {
-    margin-top: 10px;
-  }
 </style>
 </head>
 <body>
-
+  <iframe id="audioFrame" src="audio.html" style="display: none;"></iframe>
+  
 <div id="backgroundWrapper">
 </div>
 
@@ -87,6 +53,11 @@
   <div id="player"></div>
 </div>
 <div id="status">점수: <span id="score">0</span> <br> 목숨: <span id="lives">❤️❤️❤️</span></div>
+
+<audio id="backgroundMusic" loop autoplay>
+  <source src="./sound/bgm.mp3" type="audio/mp3">
+  브라우저가 오디오를 지원하지 않습니다.
+</audio>
 
 <script>
   const gameContainer = document.getElementById("gameContainer");
@@ -110,11 +81,11 @@
     if (event.key === "ArrowUp" && !isJumping) jump();
     if (event.key === "ArrowLeft") {
         moveLeft = true;
-        player.style.backgroundImage = "url('images/player.gif')"; // 왼쪽 이동 이미지
+        player.style.backgroundImage = "url('./images/player1.gif')"; // 왼쪽 이동 이미지
     }
     if (event.key === "ArrowRight") {
         moveRight = true;
-        player.style.backgroundImage = "url('images/player_right.gif')"; // 오른쪽 이동 이미지
+        player.style.backgroundImage = "url('./images/player_right1.gif')"; // 오른쪽 이동 이미지
     }
   });
 
